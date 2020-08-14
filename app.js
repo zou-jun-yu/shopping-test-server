@@ -48,7 +48,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api2/users", usersRouter);
 app.use("/api2/shopping", shoppingRouter);
 
-//以下注释的方法用来爬取某些网站的分类和商品数据并保存的数据库中，这里就不给出实现了，因为实际应用中应该是自己手动添加分类和商品数据。
+//以下注释的方法用来爬取某些网站的分类和商品数据并保存在数据库中，这里就不给出实现了，因为实际应用中应该是自己手动添加分类和商品数据。
 // app.use(
 //   "/api2/downloadImageToServer",
 //   downloadImageToServerRouterAndController

@@ -16,6 +16,7 @@ const CartItemSchema = new mongoose.Schema({
 });
 const CartSchema = new mongoose.Schema({
   userId: { type: String, required: true },
+  //其实购物车条目要么前后端都用对象，要么都用数组会比较好，这样就不用进行转化了
   cartItems: { type: [CartItemSchema], required: true },
 });
 

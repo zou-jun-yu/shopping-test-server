@@ -15,13 +15,14 @@ async function getSubCategories(req, res) {
   const { parentId } = req.query;
   CategoryModel.find({ parentId }, function (error, subCategories) {
     if (error) {
-      res.send({ code: -1, msg: "查询分类失败", data: { error } });
+      res.send({ code: -1, msg: "查询子类列表失败", data: { error } });
     } else {
-      res.send({ code: 0, msg: "查询分类成功", data: { subCategories } });
+      res.send({ code: 0, msg: "查询子类列表成功", data: { subCategories } });
     }
   });
 }
 
+//根据某个一级分类查询它的所有后代分类
 async function getSubCategoriesLevel2AndLevel3(req, res) {
   const { parentId } = req.query;
   let categoriesLevel2 = await CategoryModel.find({ parentId });
