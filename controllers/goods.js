@@ -27,6 +27,7 @@ async function getGoodsList(req, res) {
     });
 }
 
+//跟上一个处理函数相似度很高，可以考虑将它们合成一个。
 async function searchGoods(req, res) {
   let { keyWord, pageSize, pageNumber } = req.query;
   pageSize = parseInt(pageSize);
@@ -87,6 +88,7 @@ async function deleteManyGoods(req, res) {
   });
 }
 
+//使用promise的写法看起来是比较啰嗦一点，还是async/await比较简洁，这里纯粹只是为了练习一下promise。
 async function getGoodsDetail(req, res) {
   const { _id } = req.query;
   let goodsDetail = {};

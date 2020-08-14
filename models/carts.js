@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const CartItemSchema = new mongoose.Schema({
   goodsNumber: { type: Number, required: true },
   checked: { type: Boolean, required: true },
+  //保存用户购买时的商品信息作为一个快照，因为商品价格等信息以后可能会变化。
   goodsId: { type: String, required: true },
   goodsName: { type: String, required: true },
   goodsDescription: { type: String },
