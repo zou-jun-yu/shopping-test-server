@@ -48,6 +48,18 @@ async function searchGoods(req, res) {
     });
 }
 
+async function getRandomGoods(req, res) {
+  const {goodsNumber} = req.query;
+  GoodsModel.find().exec(function (error, goodsList) {
+    goodsList = goodsList.sort((a,b)=>(Math.random()-0.5)).slice(0,goodsNumber);
+      if (error) {
+        res.send({ code: -1, msg: "随机获取商品失败", data: { error } });
+      } else {
+        res.send({ code: 0, msg: "随机获取商品成功", data: { goodsList } });
+      }
+    });
+}
+
 async function addOrUpdateGoods(req, res) {
   const goods = req.body;
   if (goods._id) {
@@ -88,7 +100,6 @@ async function deleteManyGoods(req, res) {
   });
 }
 
-//使用promise的写法看起来是比较啰嗦一点，还是async/await比较简洁，这里纯粹只是为了练习一下promise。
 async function getGoodsDetail(req, res) {
   const { _id } = req.query;
   let goodsDetail = {};
@@ -156,4 +167,5 @@ module.exports = {
   getGoodsList,
   deleteManyGoods,
   searchGoods,
+  getRandomGoods
 };

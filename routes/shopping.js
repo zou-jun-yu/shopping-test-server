@@ -11,6 +11,7 @@ const {
   getSubCategories,
   getSubCategoriesLevel2AndLevel3,
   getCategoryById,
+  getRandomCategoriesLevel3,
 } = require("../controllers/categories");
 
 
@@ -20,6 +21,7 @@ const {
   getGoodsDetail,
   getGoodsList,
   searchGoods,
+  getRandomGoods,
 } = require("../controllers/goods");
 
 
@@ -48,13 +50,14 @@ router.post("/addOrUpdateCategory", addOrUpdateCategory);
 router.post("/deleteCategory", deleteCategory);
 router.get("/getSubCategories", getSubCategories);
 router.get("/getSubCategoriesLevel2AndLevel3", getSubCategoriesLevel2AndLevel3);
-
+router.get("/getRandomCategoriesLevel3", getRandomCategoriesLevel3);
 
 router.post("/addOrUpdateGoods", addOrUpdateGoods);
 router.post("/deleteManyGoods", deleteManyGoods);
 router.get("/getGoodsDetail", getGoodsDetail);
 router.get("/getGoodsList", getGoodsList);
 router.get("/searchGoods", searchGoods);
+router.get("/getRandomGoods", getRandomGoods);
 
 
 router.get("/getCart", getCart);

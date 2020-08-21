@@ -80,10 +80,23 @@ async function deleteCategory(req, res) {
   });
 }
 
+async function getRandomCategoriesLevel3(req, res) {
+  const {categoryNumber} = req.query;
+  CategoryModel.find({ categoryImage:{  $exists: true } }, function (error, categories) {
+    categories = categories.sort((a,b)=>(Math.random()-0.5)).slice(0,categoryNumber);
+    if (error) {
+      res.send({ code: -1, msg: "获取随机分类失败", data: { error } });
+    } else {
+      res.send({ code: 0, msg: "获取随机分类成功", data: { categories } });
+    }
+  });
+}
+
 module.exports = {
   getCategoryById,
   addOrUpdateCategory,
   deleteCategory,
   getSubCategories,
   getSubCategoriesLevel2AndLevel3,
+  getRandomCategoriesLevel3
 };

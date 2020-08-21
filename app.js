@@ -7,13 +7,13 @@ var logger = require("morgan");
 var session = require("express-session");
 var { Mongoose } = require("./untils/config.js");
 
-// var indexRouter = require("./routes/index");
+var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var shoppingRouter = require("./routes/shopping");
 
 
 // var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
-// var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
+var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -48,12 +48,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api2/users", usersRouter);
 app.use("/api2/shopping", shoppingRouter);
 
-//爬取一些网站少量的分类和商品数据并保存在数据库中。
+//一些网站少量的分类和商品数据并保存在数据库中。
 // app.use(
 //   "/api2/downloadImageToServer",
 //   downloadImageToServerRouterAndController
 // );
-// app.use("/api2/generateData", generateDataRouterAndController);
+app.use("/api2/generateData", generateDataRouterAndController);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
