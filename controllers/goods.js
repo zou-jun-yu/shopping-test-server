@@ -6,12 +6,12 @@ const CategoryModel = require("../models/categories");
 const fsPromises = fs.promises;
 
 async function getGoodsList(req, res) {
-  let { categoryId, pageSize, pageNumber } = req.query;
+  let { categoryId, pageSize, pageNumber, sortField, isAscending } = req.query;
   pageSize = parseInt(pageSize);
   pageNumber = parseInt(pageNumber);
-  const total = await GoodsModel.count({ categoryId });
+  const total = await GoodsModel.countDocuments({ categoryId });
   GoodsModel.find({ categoryId })
-    .sort({ marketPrice: 1 })
+    .sort({ [sortField]: isAscending&&(isAscending.toString()==="true" ? 1 : -1) })
     .skip(pageSize * (pageNumber - 1))
     .limit(pageSize)
     .exec(function (error, goodsList) {
@@ -29,14 +29,14 @@ async function getGoodsList(req, res) {
 
 //跟上一个处理函数相似度很高，可以考虑将它们合成一个。
 async function searchGoods(req, res) {
-  let { keyWord, pageSize, pageNumber } = req.query;
+  let { keyWord, pageSize, pageNumber, sortField, isAscending } = req.query;
   pageSize = parseInt(pageSize);
   pageNumber = parseInt(pageNumber);
-  const total = await GoodsModel.count({
+  const total = await GoodsModel.countDocuments({
     goodsName: { $regex: new RegExp(keyWord, "gi") },
   });
   GoodsModel.find({ goodsName: { $regex: new RegExp(keyWord, "gi") } })
-    .sort({ marketPrice: 1 })
+    .sort({ [sortField]: isAscending.toString()==="true" ? 1 : -1 })
     .skip(pageSize * (pageNumber - 1))
     .limit(pageSize)
     .exec(function (error, goodsList) {
@@ -49,15 +49,17 @@ async function searchGoods(req, res) {
 }
 
 async function getRandomGoods(req, res) {
-  const {goodsNumber} = req.query;
+  const { goodsNumber } = req.query;
   GoodsModel.find().exec(function (error, goodsList) {
-    goodsList = goodsList.sort((a,b)=>(Math.random()-0.5)).slice(0,goodsNumber);
-      if (error) {
-        res.send({ code: -1, msg: "随机获取商品失败", data: { error } });
-      } else {
-        res.send({ code: 0, msg: "随机获取商品成功", data: { goodsList } });
-      }
-    });
+    goodsList = goodsList
+      .sort((a, b) => Math.random() - 0.5)
+      .slice(0, goodsNumber);
+    if (error) {
+      res.send({ code: -1, msg: "随机获取商品失败", data: { error } });
+    } else {
+      res.send({ code: 0, msg: "随机获取商品成功", data: { goodsList } });
+    }
+  });
 }
 
 async function addOrUpdateGoods(req, res) {
@@ -167,5 +169,5 @@ module.exports = {
   getGoodsList,
   deleteManyGoods,
   searchGoods,
-  getRandomGoods
+  getRandomGoods,
 };
