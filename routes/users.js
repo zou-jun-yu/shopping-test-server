@@ -3,6 +3,7 @@ var router = express.Router();
 
 var usersController = require('../controllers/users');
 
+//用户相关的路由
 router.post('/login', usersController.login);
 router.get('/logout', usersController.logout);
 router.post('/register', usersController.register);

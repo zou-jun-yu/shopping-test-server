@@ -2,16 +2,19 @@ var md5 = require("blueimp-md5");
 var { Email, createToken } = require("../untils/config");
 var UserModel = require("../models/users");
 
+//登录
 var login = async (req, res, next) => {
   var { username, password } = req.body;
   UserModel.find({ username, password: md5(password) })
     .then((data) => {
       if (data.length > 0) {
         if (username === "admin") {
+          //登录的是管理员
           var token = createToken({ login: true, username });
           res.send({ msg: "登录成功", status: 0, data: { token } });
           return;
         }
+        //登录的是客户
         req.session.username = username;
         res.send({ msg: "登录成功", status: 0, data: { username } });
       } else {
@@ -23,6 +26,7 @@ var login = async (req, res, next) => {
     });
 };
 
+//登出
 var logout = async (req, res, next) => {
   req.session.username = "";
   res.send({
@@ -31,6 +35,7 @@ var logout = async (req, res, next) => {
   });
 };
 
+//注册
 var register = async (req, res, next) => {
   var { username, password, email, verify } = req.body;
   if (email != req.session.email || verify != req.session.verify) {
@@ -60,6 +65,7 @@ var register = async (req, res, next) => {
   }
 };
 
+//获取验证码
 var verify = async (req, res, next) => {
   var email = req.query.email;
   var verify = Email.verify;
@@ -86,6 +92,7 @@ var verify = async (req, res, next) => {
   });
 };
 
+//获取用户信息
 var getUser = async (req, res, next) => {
   if (req.session.username) {
     res.send({
@@ -103,6 +110,7 @@ var getUser = async (req, res, next) => {
   }
 };
 
+//忘记密码
 var findPassword = async (req, res, next) => {
   var { email, verify, password } = req.body;
   if (email === req.session.email && verify === req.session.verify) {

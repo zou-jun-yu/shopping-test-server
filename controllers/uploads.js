@@ -4,6 +4,7 @@ const path = require("path");
 const { SERVER_BASE_URL } = require("../untils/config");
 const imageDirPath = path.join(__dirname, "..", "public/images/uploads");
 
+//上传一张图片
 async function uploadImage(req, res) {
   res.send({
     code: 0,
@@ -14,6 +15,7 @@ async function uploadImage(req, res) {
   });
 }
 
+//删除一张图片
 async function deleteUploadImage(req, res) {
   const { imageName } = req.body;
   fs.unlink(path.join(imageDirPath, imageName), (error) => {

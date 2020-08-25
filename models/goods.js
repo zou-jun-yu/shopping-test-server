@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+//商品模型
 var GoodsSchema = new mongoose.Schema({
     goodsName: { type: String, required: true },
     goodsDescription: { type: String },

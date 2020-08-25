@@ -1,5 +1,6 @@
 const OrderModel = require("../models/orders");
 
+//添加一个订单
 async function addOrder(req, res) {
   const order = req.body;
   new OrderModel(order).save(function (error, order) {
@@ -11,6 +12,7 @@ async function addOrder(req, res) {
   });
 }
 
+//查询所有订单
 async function getOrders(req, res) {
   OrderModel.find({}, function (error, orders) {
     if (error) {

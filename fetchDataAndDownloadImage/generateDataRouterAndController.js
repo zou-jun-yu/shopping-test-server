@@ -8,12 +8,14 @@ const GoodsModel = require("../models/goods");
 
 var router = express.Router();
 
+//向唯品会网站请求少量数据以便测试本电商网站的功能
 router.post("/", function generateData(req, res) {
   let categoryArrayLevel1 = [],
     cate_lv1 = null,
     categoryArrayLevel3Unhandle = [],
     offset = -1,
     goodsNowPrice = {},
+    //保存所有将要下载的图片
     imagesWillDownload = {
       categoryImageCount: 0,
       goodsImageCount: 0,
@@ -29,7 +31,8 @@ router.post("/", function generateData(req, res) {
     },
   })
     .then((response) => {
-      cate_lv1 = response.data.data.cate_lv1.slice(0,1); //限制一级分类列表的元素个数
+      //如果数据太多，可以截取某几个一级分类下的所有分类和商品
+      cate_lv1 = response.data.data.cate_lv1.slice(0, 1);
       return CategoryModel.insertMany(
         cate_lv1.map((element1) => ({
           parentId: "0",
@@ -54,6 +57,7 @@ router.post("/", function generateData(req, res) {
       );
       return Promise.all(reqPromises);
     })
+    //得到这些一级分类下的所有二级分类
     .then((categoryBigDataObjectResponseArrayLevel2) => {
       let categoryArrayLevel2WillInsert = [];
       categoryBigDataObjectResponseArrayLevel2.forEach(
@@ -70,6 +74,7 @@ router.post("/", function generateData(req, res) {
               parentId: categoryArrayLevel1[index1]._id,
               categoryName: element2.name,
             });
+            //element2是一个二级分类对象，element3是一个三级分类对象
             element2.children.forEach((element3, index3) => {
               const imageName = element3.image.substring(
                 element3.image.lastIndexOf("/") + 1
@@ -78,6 +83,8 @@ router.post("/", function generateData(req, res) {
               //   //限制三级分类列表的数量
               //   return;
               // }
+
+              //三级分类数组中间状态，需要转换成最终的三级分类数组
               categoryArrayLevel3Unhandle.push({
                 categoryName: element3.name,
                 categoryImage: imageName,
@@ -103,6 +110,7 @@ router.post("/", function generateData(req, res) {
       const reqGoodsListPromises = [];
       for (let index = 0; index < categoryArrayLevel3Unhandle.length; index++) {
         const item = categoryArrayLevel3Unhandle[index];
+        //最终要插入数据库的三级分类列表
         categoryArrayLevel3WillInsert.push({
           categoryName: item.categoryName,
           categoryImage: item.categoryImage,
@@ -110,7 +118,7 @@ router.post("/", function generateData(req, res) {
         });
         // if(index>5){return;} //访问频率控制
         let goodListBigObjectResponse;
-        // const startTime = Date.now();                
+        // const startTime = Date.now();
         // let randomInterval = Math.random() * 2000 + 1200;
         // if ((index + 1) % 21 === 0) {
         //   randomInterval = randomInterval + 110000;
@@ -121,6 +129,7 @@ router.post("/", function generateData(req, res) {
         // );
         if (item.categoryId[0] !== "5") continue;
         console.log("发出个" + (index + 1) + "商品列表请求");
+        //获取某个三级分类下的所有商品列表
         try {
           goodListBigObjectResponse = await axios({
             url:
@@ -134,7 +143,7 @@ router.post("/", function generateData(req, res) {
             },
           });
         } catch (err) {
-          console.log(err)
+          console.log(err);
           throw { message: "请求商品列表出错" };
         }
         if (goodListBigObjectResponse.data.data === undefined) continue;
@@ -160,8 +169,9 @@ router.post("/", function generateData(req, res) {
         let reqGoodsDetailPromiseListList = [];
         for (let goodListBigObjectResponse of goodListBigObjectResponseArray) {
           const randomStart = Math.floor(Math.random() * 20);
-          const weightArray = [1,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5];
-          const randomCount = weightArray[Math.floor((Math.random()*weightArray.length))]
+          const weightArray = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5];
+          const randomCount =
+            weightArray[Math.floor(Math.random() * weightArray.length)];
           //限制每个三级分类列表下的商品个数。每个分类下的商品有300个，每次请求一个分类下的商品列表都返回默认30个商品简略信息的一个分页，这里默认从前30个随机抽取几个。
           let reqGoodsDetailPromiseList = [];
           for (let goodsInfo of goodListBigObjectResponse.data.data.items.slice(
@@ -216,6 +226,7 @@ router.post("/", function generateData(req, res) {
     )
     .then(([categoryArrayLevel3Fromdb, ...responseGoodsDetailArrayArray]) => {
       console.log("请求商品详情成功");
+      //得到所有商品详情并将它们转换成期望的格式然后，保存到数据库中
       let goodsDetailList = [];
       responseGoodsDetailArrayArray.forEach(
         (responseGoodsDetailArray, index) => {
@@ -241,7 +252,7 @@ router.post("/", function generateData(req, res) {
               goodsAmount: Math.ceil(Math.random() * 60 + 30),
               marketPrice: goodsDetailOrigin.marketPrice,
               nowPrice: goodsNowPrice[goodsDetailOrigin.productIdStr],
-              salesNumber: Math.floor(Math.random() * 161)
+              salesNumber: Math.floor(Math.random() * 161),
             });
             previewImages.forEach((previewImage, index) => {
               imagesWillDownload.goodsImageCount++;
@@ -260,17 +271,18 @@ router.post("/", function generateData(req, res) {
       return GoodsModel.insertMany(goodsDetailList);
     })
     .then(async (goodsDetailListFromdb) => {
+      //开始下载所有三级分类图片和商品详情图片
       console.log("一共插入" + goodsDetailListFromdb.length + "种商品");
       console.log(
         "分类图片一共" + imagesWillDownload.categoryImageCount + "张"
       );
       console.log("商品图片一共" + imagesWillDownload.goodsImageCount + "张");
-      const totleImagesCount = imagesWillDownload.imagesGoodsCategory.length;
+      const totalImagesCount = imagesWillDownload.imagesGoodsCategory.length;
       console.log("即将开始下载所有图片。。。。。。。。。。。");
       try {
-        for (var i = 0; i < totleImagesCount; i++) {
+        for (var i = 0; i < totalImagesCount; i++) {
           const imageUrl = imagesWillDownload.imagesGoodsCategory[i].imageUrl;
-          if(!imageUrl) continue;
+          if (!imageUrl) continue;
           const msg = await downloadImageToServer({
             imageUrl,
             imageName: imagesWillDownload.imagesGoodsCategory[i].imageName,
@@ -281,7 +293,7 @@ router.post("/", function generateData(req, res) {
               (i + 1) +
               "张图片。" +
               "一共有" +
-              totleImagesCount +
+              totalImagesCount +
               "张图片，其中分类图片" +
               imagesWillDownload.categoryImageCount +
               "张，商品图片" +
@@ -302,7 +314,7 @@ router.post("/", function generateData(req, res) {
         }
         res.send("商品详情总数为：" + goodsDetailListFromdb.length);
       } catch (err) {
-        console.log(err)
+        console.log(err);
         throw err;
       }
     })
