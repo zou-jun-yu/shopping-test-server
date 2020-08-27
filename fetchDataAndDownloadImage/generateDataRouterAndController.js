@@ -10,6 +10,7 @@ var router = express.Router();
 
 //向唯品会网站请求少量数据以便测试本电商网站的功能
 router.post("/", function generateData(req, res) {
+  const { start, end } = req.body;
   let categoryArrayLevel1 = [],
     cate_lv1 = null,
     categoryArrayLevel3Unhandle = [],
@@ -32,7 +33,7 @@ router.post("/", function generateData(req, res) {
   })
     .then((response) => {
       //如果数据太多，可以截取某几个一级分类下的所有分类和商品
-      cate_lv1 = response.data.data.cate_lv1.slice(0, 1);
+      cate_lv1 = response.data.data.cate_lv1.slice(start, end);
       return CategoryModel.insertMany(
         cate_lv1.map((element1) => ({
           parentId: "0",
