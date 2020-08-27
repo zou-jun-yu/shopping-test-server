@@ -1,5 +1,9 @@
 const express = require("express");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const dirPath = path.join(__dirname, "..", "public/images/uploads");
 
 const { uploadImage, deleteUploadImage } = require("../controllers/uploads");
 
@@ -28,7 +32,17 @@ const router = express.Router();
 //图片上传和删除
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./public/images/uploads");
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdir(dirPath, function (err) {
+        if (err) {
+          console.log(err);
+        } else {
+          cb(null, dirPath);
+        }
+      });
+    } else {
+      cb(null, dirPath);
+    }
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + Date.now() + ".jpg");
