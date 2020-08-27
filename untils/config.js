@@ -10,7 +10,7 @@ mongoose.set("useUnifiedTopology", true);
 
 //连接数据库
 var Mongoose = {
-  url: "mongodb://localhost:27017/shoppingServer",
+  url: "mongodb://myTester:zzzzzz@localhost:27017/shoppingServer",
   connect() {
     mongoose.connect(this.url, (err) => {
       if (err) {
