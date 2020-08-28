@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const imageDirPath = path.join(__dirname, "..", "public/images/uploads");
-const GoodsModel = require("../models/goods");
 const CategoryModel = require("../models/categories");
+const GoodsModel = require("../models/goods");
 
 const fsPromises = fs.promises;
 

@@ -118,7 +118,7 @@ router.post("/", function generateData(req, res) {
           parentId: categoryArrayLevel2Fromdb[item.offset]._id,
         });
         // if(index>5){return;} //访问频率控制
-        let goodListBigObjectResponse;
+        let goodsListBigObjectResponse;
         // const startTime = Date.now();
         // let randomInterval = Math.random() * 2000 + 1200;
         // if ((index + 1) % 21 === 0) {
@@ -132,7 +132,7 @@ router.post("/", function generateData(req, res) {
         console.log("发出个" + (index + 1) + "商品列表请求");
         //获取某个三级分类下的所有商品列表
         try {
-          goodListBigObjectResponse = await axios({
+          goodsListBigObjectResponse = await axios({
             url:
               "https://mst.vip.com/dp/getData?pageId=10000287&componentId=2970&pageSize=30&abtId=2554&app_name=shop_wap&app_version=1.0&warehouse=VIP_NH&fdc_area_id=104104119&area_id=104104&api_key=8cec5243ade04ed3a02c5972bcda0d3f&mars_cid=1593158605734_5d7a44aa608375f02e66e9717f7231a2&total=300&ruleId=" +
               item.categoryId +
@@ -145,12 +145,14 @@ router.post("/", function generateData(req, res) {
           });
         } catch (err) {
           console.log(err);
-          throw { message: "请求商品列表出错" };
+          throw {
+            message: "请求商品列表出错,此时的categoryId为：" + item.categoryId,
+          };
         }
-        if (goodListBigObjectResponse.data.data === undefined) continue;
+        if (goodsListBigObjectResponse.data.data === undefined) continue;
         console.log("已收到第" + (index + 1) + "个商品列表响应");
         // 本来打算将各个axios返回的promise对象放到这个数组中然后用Promise.all()并发去请求的，但是为了限制请求速率，才使用了async和await。另外数组的forEach和map方法与async、await结合时有点问题，所以改用为for循环或者for-of循环。
-        reqGoodsListPromises.push(goodListBigObjectResponse);
+        reqGoodsListPromises.push(goodsListBigObjectResponse);
       }
       return Promise.all([
         CategoryModel.insertMany(categoryArrayLevel3WillInsert),
@@ -160,7 +162,7 @@ router.post("/", function generateData(req, res) {
     .then(
       async ([
         categoryArrayLevel3Fromdb,
-        ...goodListBigObjectResponseArray
+        ...goodsListBigObjectResponseArray
       ]) => {
         console.log(
           "已插入三级分类列表，个数为：" + categoryArrayLevel3Fromdb.length
@@ -168,14 +170,14 @@ router.post("/", function generateData(req, res) {
         // throw { message: "三级分类图片以及商品详情列表暂时不请求和下载" };
         let goodsDetailCount = 0;
         let reqGoodsDetailPromiseListList = [];
-        for (let goodListBigObjectResponse of goodListBigObjectResponseArray) {
+        for (let goodsListBigObjectResponse of goodsListBigObjectResponseArray) {
           const randomStart = Math.floor(Math.random() * 20);
           const weightArray = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5];
           const randomCount =
             weightArray[Math.floor(Math.random() * weightArray.length)];
           //限制每个三级分类列表下的商品个数。每个分类下的商品有300个，每次请求一个分类下的商品列表都返回默认30个商品简略信息的一个分页，这里默认从前30个随机抽取几个。
           let reqGoodsDetailPromiseList = [];
-          for (let goodsInfo of goodListBigObjectResponse.data.data.items.slice(
+          for (let goodsInfo of goodsListBigObjectResponse.data.data.items.slice(
             randomStart,
             randomStart + randomCount
           )) {
