@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const imageDirPath = path.join(__dirname, "..", "public/images/uploads");
+const { imageDirPath } = require("../untils/config");
 const CategoryModel = require("../models/categories");
 const GoodsModel = require("../models/goods");
 

@@ -1,8 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { SERVER_BASE_URL } = require("../untils/config");
-const imageDirPath = path.join(__dirname, "..", "public/images/uploads");
+const { imageDirPath } = require("../untils/config");
 
 //上传一张图片
 async function uploadImage(req, res) {
@@ -10,7 +9,7 @@ async function uploadImage(req, res) {
     code: 0,
     msg: "图片上传成功",
     data: {
-      src: process.env.NODE_ENV===development?SERVER_BASE_URL:"http://47.115.157.0/" + req.file.filename,
+      src: imageDirPath + "/" + req.file.filename,
     },
   });
 }

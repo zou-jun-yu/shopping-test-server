@@ -1,7 +1,12 @@
-var SERVER_BASE_URL = "http://localhost:5000/";
+var path = require("path");
 var mongoose = require("mongoose");
 var nodemailer = require("nodemailer");
 var jwt = require("jsonwebtoken");
+
+var imageDirPath =
+  process.env.NODE_ENV === "development"
+    ? path.join(__dirname, "..", "public/images/uploads")
+    : "/usr/share/nginx/html/images";
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
@@ -9,13 +14,14 @@ mongoose.set("useCreateIndex", true);
 mongoose.set("useUnifiedTopology", true);
 
 //连接数据库
+console.log(process.env.NODE_ENV);
 var Mongoose = {
-  // url: "mongodb://localhost:27017/shoppingServer",
   url:
-    process.env.NODE_ENV === "production"
+    process.env.NODE_ENV !== "development"
       ? "mongodb://myTester:zzzzzz@localhost:27017/shoppingServer"
       : "mongodb://localhost:27017/shoppingServer",
   connect() {
+    console.log({ url: this.url });
     mongoose.connect(this.url, (err) => {
       if (err) {
         console.log("数据库连接失败" + err);
@@ -71,5 +77,5 @@ module.exports = {
   Email,
   createToken,
   checkToken,
-  SERVER_BASE_URL,
+  imageDirPath,
 };
