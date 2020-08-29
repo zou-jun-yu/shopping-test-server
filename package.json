@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=production nodemon ./bin/www"
+    "start": "cross-env NODE_ENV=development nodemon ./bin/www"
   },
   "dependencies": {
     "axios": "^0.19.2",
