@@ -1,4 +1,4 @@
-var SERVER_BASE_URL = "http://localhost:5000";
+var SERVER_BASE_URL = "http://localhost:5000/";
 var mongoose = require("mongoose");
 var nodemailer = require("nodemailer");
 var jwt = require("jsonwebtoken");

@@ -10,7 +10,7 @@ async function uploadImage(req, res) {
     code: 0,
     msg: "图片上传成功",
     data: {
-      src: SERVER_BASE_URL + "/images/uploads/" + req.file.filename,
+      src: process.env.NODE_ENV===development?SERVER_BASE_URL:"http://47.115.157.0/" + req.file.filename,
     },
   });
 }
