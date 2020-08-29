@@ -4,8 +4,10 @@ module.exports = {
       name: "ShoppingServer",
       instances: 1,
       script: "./bin/www",
+      log_date_format:"YYYY-MM-DD HH:mm Z",
       autorestart: true,
-      watch: false,
+      watch: true,
+      ignore_watch : ["node_modules", "public"],
     },
   ],
 
