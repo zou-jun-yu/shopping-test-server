@@ -95,7 +95,7 @@ async function deleteCategory(req, res) {
     const goodsList = await GoodsModel.find({ categoryId: category._id });
     images = images.concat(goodsList.map((goods) => goods.goodsImages).flat());
     goodsIds = goodsList.map((goods) => goods._id);
-  } else if (category.parentId === 0) {
+  } else if (category.parentId === "0") {
     //如果是一级分类
     const categoriesLevel2 = await CategoryModel.find({
       parentId: category._id,
@@ -141,7 +141,7 @@ async function deleteCategory(req, res) {
     _id: { $in: categoryIds },
   });
   const goodsPromise = GoodsModel.deleteMany({ _id: { $in: goodsIds } });
-  const imagesPromise = Promise.all(
+  const imagesPromise = Promise.allSettled(
     images.map((imageName) =>
       fsPromises.unlink(path.join(imageDirPath, imageName))
     )
@@ -149,18 +149,18 @@ async function deleteCategory(req, res) {
   //等待所有删除操作完成
   const categoryDeleteInfo = await categoryPromise;
   const goodsDeleteInfo = await goodsPromise;
-  const imagesDeleteInfo = await imagesPromise;
-  if (categoryDeleteInfo.ok && goodsDeleteInfo.ok && !imagesDeleteInfo[0]) {
+  const imagesDeleteResults = await imagesPromise;
+  if (categoryDeleteInfo.ok && goodsDeleteInfo.ok) {
     res.send({
       code: 0,
       msg: "删除分类及其所有后代分类、商品成功",
-      data: { categoryDeleteInfo, goodsDeleteInfo, imagesDeleteInfo },
+      data: { categoryDeleteInfo, goodsDeleteInfo, imagesDeleteResults },
     });
   } else {
     res.send({
       code: -1,
       msg: "删除分类及其所有后代分类、商品失败",
-      data: { categoryDeleteInfo, goodsDeleteInfo, imagesDeleteInfo },
+      data: { categoryDeleteInfo, goodsDeleteInfo, imagesDeleteResults },
     });
   }
 }
