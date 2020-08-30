@@ -3,9 +3,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const dirPath = path.join(__dirname, "..", "public/images/uploads");
-
 const { uploadImage, deleteUploadImage } = require("../controllers/uploads");
+const { imageDirPath } = require("../untils/config");
 
 const {
   addOrUpdateCategory,
@@ -32,16 +31,16 @@ const router = express.Router();
 //图片上传和删除
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdir(dirPath, function (err) {
+    if (!fs.existsSync(imageDirPath)) {
+      fs.mkdir(imageDirPath, function (err) {
         if (err) {
           console.log(err);
         } else {
-          cb(null, dirPath);
+          cb(null, imageDirPath);
         }
       });
     } else {
-      cb(null, dirPath);
+      cb(null, imageDirPath);
     }
   },
   filename: function (req, file, cb) {
