@@ -4,24 +4,23 @@ var nodemailer = require("nodemailer");
 var jwt = require("jsonwebtoken");
 
 var imageDirPath =
-  process.env.NODE_ENV === "development"
-    ? path.join(__dirname, "..", "public/images/uploads")
-    : "/usr/share/nginx/html/images";
+  process.env.NODE_ENV === "production"
+    ? "/usr/share/nginx/html/images"
+    : path.join(__dirname, "..", "public/images/uploads");
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose.set("useUnifiedTopology", true);
 
+console.log("当前环境是："+process.env.NODE_ENV)
 //连接数据库
-console.log(process.env.NODE_ENV);
 var Mongoose = {
   url:
-    process.env.NODE_ENV !== "development"
+    process.env.NODE_ENV === "production"
       ? "mongodb://myTester:zzzzzz@localhost:27017/shoppingServer"
       : "mongodb://localhost:27017/shoppingServer",
   connect() {
-    console.log({ url: this.url });
     mongoose.connect(this.url, (err) => {
       if (err) {
         console.log("数据库连接失败" + err);

@@ -6,6 +6,12 @@ module.exports = {
       script: "./bin/www",
       log_date_format: "YYYY-MM-DD HH:mm Z",
       autorestart: true,
+      env: {
+        NODE_ENV: "development",
+      },
+      env_production: {
+        NODE_ENV: "production",
+      },
       // watch: true,
       // ignore_watch: ["node_modules", "public"],
     },
@@ -21,6 +27,9 @@ module.exports = {
       "post-deploy":
         // "git pull && npm install && pm2 reload ecosystem.config.js --env production",
         "git pull && pm2 reload ecosystem.config.js --env production",
+      env: {
+        NODE_ENV: "production",
+      },
     },
   },
 };

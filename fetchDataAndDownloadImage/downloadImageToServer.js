@@ -2,10 +2,7 @@ var http = require("http");
 var fs = require("fs");
 var path = require("path");
 
-var imageDirPath =
-  process.env.NODE_ENV === "development"
-    ? path.join(__dirname, "..", "public/images/uploads")
-    : "/usr/share/nginx/html/images";
+var { imageDirPath } = require("../untils/config");
 // : path.join(__dirname,"../../../../../","usr/share/nginx/html/images");
 
 //向别的网站请求一张图片并保存到本服务器

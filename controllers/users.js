@@ -22,7 +22,7 @@ var login = async (req, res, next) => {
       }
     })
     .catch((err) => {
-      res.send({ msg: "内部错误", status: -2 });
+      res.send({ msg: "内部错误", status: -2, err });
     });
 };
 
