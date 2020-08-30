@@ -5,12 +5,14 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 var session = require("express-session");
+var MongoStore = require("connect-mongo")(session);
+var mongoose = require("mongoose");
+
 var { Mongoose } = require("./untils/config.js");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var shoppingRouter = require("./routes/shopping");
-
 
 // var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
 // var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
@@ -18,18 +20,32 @@ var shoppingRouter = require("./routes/shopping");
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+// app.use(
+//   session({
+//     secret: "fn%$%afho07",
+//     name: "sessionId",
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       maxAge: 1000 * 60 * 60 * 24 * 7,
+//     },
+//   })
+// );
+Mongoose.connect();
+app.use(cookieParser());
 app.use(
   session({
-    secret: "fn%$%afho07",
-    name: "sessionId",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
+    secret:"fn%$%afho07",
+    saveUninitialized : true,
+    resave: true,
+    store: new MongoStore({
+      mongooseConnection: mongoose.connection,
+      autoRemove: "interval",
+      autoRemoveInterval: 60 * 24 * 7,
+      secret: "fhuiqeg15yf24jtn1oi4tyo",
+    }),
   })
 );
-Mongoose.connect();
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -41,7 +57,6 @@ app.use(
     extended: false,
   })
 );
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
