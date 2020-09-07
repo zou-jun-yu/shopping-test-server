@@ -29,6 +29,7 @@ var login = async (req, res, next) => {
 //登出
 var logout = async (req, res, next) => {
   req.session.username = "";
+  req.session.cookie.expires = new Date(0);
   res.send({
     msg: "退出成功",
     status: 0,
@@ -51,6 +52,7 @@ var register = async (req, res, next) => {
     })
       .then(() => {
         req.session.verify = "";
+        req.session.cookie.expires = new Date(0);
         res.send({
           msg: "注册成功",
           status: 0,
