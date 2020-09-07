@@ -31,27 +31,27 @@ async function getSubCategories(req, res) {
 }
 
 //根据某个一级分类查询它的所有后代分类，一级分类下有二级分类，二级分类下有三级分类
-async function getSubCategoriesLevel2AndLevel3(req, res) {
+async function getDescendantCategories(req, res) {
   const { parentId } = req.query;
-  let categoriesLevel2 = await CategoryModel.find({ parentId });
-  categoriesLevel2 = JSON.parse(JSON.stringify(categoriesLevel2));
-  let categoriesLevel3WillFind = [];
-  categoriesLevel2.forEach((categoryLevel2) =>
-    categoriesLevel3WillFind.push(
-      CategoryModel.find({ parentId: categoryLevel2._id })
+  let lv2Categories = await CategoryModel.find({ parentId });
+  lv2Categories = JSON.parse(JSON.stringify(lv2Categories));
+  let lv3CategoriesWillFind = [];
+  lv2Categories.forEach((lv2Category) =>
+    lv3CategoriesWillFind.push(
+      CategoryModel.find({ parentId: lv2Category._id })
     )
   );
-  //categoriesLevel3是一个二维数组
-  const categoriesLevel3 = await Promise.all(categoriesLevel3WillFind);
+  //lv3Categories是一个二维数组
+  const lv3Categories = await Promise.all(lv3CategoriesWillFind);
   //组装成某个一级分类下的后代森林
-  categoriesLevel2.forEach(
-    (categoryLevel2, index) =>
-      (categoryLevel2.children = categoriesLevel3[index])
+  lv2Categories.forEach(
+    (lv2Category, index) =>
+      (lv2Category.children = lv3Categories[index])
   );
   res.send({
     status: 0,
     msg: "查询该一级分类下的二、三级分类成功",
-    data: { categoriesLevel2 },
+    data: { lv2Categories },
   });
 }
 
@@ -97,43 +97,43 @@ async function deleteCategory(req, res) {
     goodsIds = goodsList.map((goods) => goods._id);
   } else if (category.parentId === "0") {
     //如果是一级分类
-    const categoriesLevel2 = await CategoryModel.find({
+    const lv2Categories = await CategoryModel.find({
       parentId: category._id,
     });
-    const categoryLevel2Ids = categoriesLevel2.map(
-      (categoryLevel2) => categoryLevel2._id
+    const lv2CategoryIds = lv2Categories.map(
+      (lv2Category) => lv2Category._id
     );
-    const categoriesLevel3 = await CategoryModel.find({
-      parentId: { $in: categoryLevel2Ids },
+    const lv3Categories = await CategoryModel.find({
+      parentId: { $in: lv2CategoryIds },
     });
-    const categoryLevel3Ids = categoriesLevel3.map(
-      (categoryLevel3) => categoryLevel3._id
+    const lv3CategoryIds = lv3Categories.map(
+      (lv3Category) => lv3Category._id
     );
     const goodsList = await GoodsModel.find({
-      categoryId: { $in: categoryLevel3Ids },
+      categoryId: { $in: lv3CategoryIds },
     });
     goodsIds = goodsList.map((goods) => goods._id);
-    categoryIds = [...categoryIds, ...categoryLevel2Ids, ...categoryLevel3Ids];
+    categoryIds = [...categoryIds, ...lv2CategoryIds, ...lv3CategoryIds];
     images = [
       ...goodsList.map((goods) => goods.goodsImages).flat(),
-      ...categoriesLevel3.map((categoryLevel3) => categoryLevel3.categoryImage),
+      ...lv3Categories.map((lv3Category) => lv3Category.categoryImage),
     ];
   } else {
     //如果是二级分类
-    const categoriesLevel3 = await CategoryModel.find({
+    const lv3Categories = await CategoryModel.find({
       parentId: category._id,
     });
-    const categoryLevel3Ids = categoriesLevel3.map(
-      (categoryLevel3) => categoryLevel3._id
+    const lv3CategoryIds = lv3Categories.map(
+      (lv3Category) => lv3Category._id
     );
     const goodsList = await GoodsModel.find({
-      categoryId: { $in: categoryLevel3Ids },
+      categoryId: { $in: lv3CategoryIds },
     });
     goodsIds = goodsList.map((goods) => goods._id);
-    categoryIds = [...categoryIds, ...categoryLevel3Ids];
+    categoryIds = [...categoryIds, ...lv3CategoryIds];
     images = [
       ...goodsList.map((goods) => goods.goodsImages).flat(),
-      ...categoriesLevel3.map((categoryLevel3) => categoryLevel3.categoryImage),
+      ...lv3Categories.map((lv3Category) => lv3Category.categoryImage),
     ];
   }
   //删除操作返回的promise
@@ -166,7 +166,7 @@ async function deleteCategory(req, res) {
 }
 
 //随机获取一些三级分类，用于在主页中进行展示。三级分类跟一二级分类的区别是它有一个图片地址属性。
-async function getRandomCategoriesLevel3(req, res) {
+async function getRandomLv3Categories(req, res) {
   const { categoryNumber } = req.query;
   CategoryModel.find({ categoryImage: { $exists: true } }, function (
     error,
@@ -188,6 +188,6 @@ module.exports = {
   addOrUpdateCategory,
   deleteCategory,
   getSubCategories,
-  getSubCategoriesLevel2AndLevel3,
-  getRandomCategoriesLevel3,
+  getDescendantCategories,
+  getRandomLv3Categories,
 };

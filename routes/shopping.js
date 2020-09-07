@@ -10,9 +10,9 @@ const {
   addOrUpdateCategory,
   deleteCategory,
   getSubCategories,
-  getSubCategoriesLevel2AndLevel3,
+  getDescendantCategories,
   getCategoryById,
-  getRandomCategoriesLevel3,
+  getRandomLv3Categories,
 } = require("../controllers/categories");
 
 const {
@@ -57,8 +57,8 @@ router.get("/getCategoryById", getCategoryById);
 router.post("/addOrUpdateCategory", addOrUpdateCategory);
 router.post("/deleteCategory", deleteCategory);
 router.get("/getSubCategories", getSubCategories);
-router.get("/getSubCategoriesLevel2AndLevel3", getSubCategoriesLevel2AndLevel3);
-router.get("/getRandomCategoriesLevel3", getRandomCategoriesLevel3);
+router.get("/getDescendantCategories", getDescendantCategories);
+router.get("/getRandomLv3Categories", getRandomLv3Categories);
 
 //商品相关
 router.post("/addOrUpdateGoods", addOrUpdateGoods);

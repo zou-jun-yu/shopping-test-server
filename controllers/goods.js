@@ -118,9 +118,9 @@ async function getGoodsDetail(req, res) {
   const { _id } = req.query;
   let goodsDetail = {};
   //保存这个商品的祖先链
-  let goodsCategoryChainNodes = [];
+  let ancestorCategories = [];
   //保存每一个祖先下的所有子分类
-  let goodsCategoryOptions = [];
+  let ancestorForest = [];
   //找到这个商品
   GoodsModel.findOne({ _id })
     .then((goods) => {
@@ -128,50 +128,50 @@ async function getGoodsDetail(req, res) {
       return CategoryModel.findOne({ _id: goods.categoryId });
     })
     //找到这个商品所属的三级分类对象
-    .then((levelThreeCategory) => {
-      goodsCategoryChainNodes.unshift(levelThreeCategory);
-      return CategoryModel.findOne({ _id: levelThreeCategory.parentId });
+    .then((lv3Category) => {
+      ancestorCategories.unshift(lv3Category);
+      return CategoryModel.findOne({ _id: lv3Category.parentId });
     })
     //找到这个二级分类
-    .then((levelTwoCategory) => {
-      goodsCategoryChainNodes.unshift(levelTwoCategory);
+    .then((lv2Category) => {
+      ancestorCategories.unshift(lv2Category);
       return Promise.all([
-        CategoryModel.findOne({ _id: levelTwoCategory.parentId }),
+        CategoryModel.findOne({ _id: lv2Category.parentId }),
         CategoryModel.find({ parentId: 0 }),
-        CategoryModel.find({ parentId: levelTwoCategory._id }),
+        CategoryModel.find({ parentId: lv2Category._id }),
       ]);
     })
     //找到这个商品的一级分类、所有一级分类、这个商品的二级分类下的所有三级分类
     .then(
-      ([levelOneCategory, levelOneCategories, targetLevelThreeCategories]) => {
-        goodsCategoryChainNodes.unshift(levelOneCategory);
-        goodsCategoryOptions = JSON.parse(JSON.stringify(levelOneCategories));
+      ([lv1Category, lv1Categories, targetLv3Categories]) => {
+        ancestorCategories.unshift(lv1Category);
+        ancestorForest = JSON.parse(JSON.stringify(lv1Categories));
         return Promise.all([
-          CategoryModel.find({ parentId: levelOneCategory._id }),
-          targetLevelThreeCategories,
+          CategoryModel.find({ parentId: lv1Category._id }),
+          targetLv3Categories,
         ]);
       }
     )
     //找到这个商品的一级分类下的所有二级分类、这个商品的二级分类下的所有三级分类（由上一级Promise链节点传递过来）
-    .then(([targetLevelTwoCategories, targetLevelThreeCategories]) => {
+    .then(([targetLv2Categories, targetLv3Categories]) => {
       //组装成森林
-      let targetLevelOneCategory = goodsCategoryOptions.filter(
-        (goodsCategoryOption) =>
-          goodsCategoryOption._id.toString() ===
-          goodsCategoryChainNodes[0]._id.toString()
+      let targetLv1Category = ancestorForest.filter(
+        (lv1Category) =>
+          lv1Category._id.toString() ===
+          ancestorCategories[0]._id.toString()
       )[0];
-      targetLevelOneCategory.children = JSON.parse(
-        JSON.stringify(targetLevelTwoCategories)
+      targetLv1Category.children = JSON.parse(
+        JSON.stringify(targetLv2Categories)
       );
-      targetLevelOneCategory.children.filter(
-        (targetLevelTwoCategory) =>
-          targetLevelTwoCategory._id.toString() ===
-          goodsCategoryChainNodes[1]._id.toString()
-      )[0].children = targetLevelThreeCategories;
+      targetLv1Category.children.filter(
+        (targetLv2Category) =>
+          targetLv2Category._id.toString() ===
+          ancestorCategories[1]._id.toString()
+      )[0].children = targetLv3Categories;
       res.send({
         code: 0,
         msg: "查询商品信息成功",
-        data: { goodsDetail, goodsCategoryChainNodes, goodsCategoryOptions },
+        data: { goodsDetail, ancestorCategories, ancestorForest },
       });
     })
     .catch((error) => {
