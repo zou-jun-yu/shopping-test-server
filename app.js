@@ -14,7 +14,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var shoppingRouter = require("./routes/shopping");
 
-var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
+// var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
 var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
 
 var app = express();
@@ -63,10 +63,10 @@ app.use("/", indexRouter);
 app.use("/api2/users", usersRouter);
 app.use("/api2/shopping", shoppingRouter);
 
-app.use(
-  "/api2/downloadImageToServer",
-  downloadImageToServerRouterAndController
-);
+// app.use(
+//   "/api2/downloadImageToServer",
+//   downloadImageToServerRouterAndController
+// );
 app.use("/api2/generateData", generateDataRouterAndController);
 
 // catch 404 and forward to error handler
