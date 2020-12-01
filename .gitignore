@@ -1,5 +1,4 @@
 node_modules
 db
 public/images/uploads/*
-fetchDataAndDownloadImage/generateDataRouterAndController.js
 !public/images/uploads/aa.txt

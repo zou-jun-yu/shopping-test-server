@@ -14,8 +14,8 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var shoppingRouter = require("./routes/shopping");
 
-// var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
-// var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
+var downloadImageToServerRouterAndController = require("./fetchDataAndDownloadImage/downloadImageToServerRouterAndController");
+var generateDataRouterAndController = require("./fetchDataAndDownloadImage/generateDataRouterAndController");
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -63,12 +63,11 @@ app.use("/", indexRouter);
 app.use("/api2/users", usersRouter);
 app.use("/api2/shopping", shoppingRouter);
 
-//获取一些网站的少量商品数据并保存在数据库中。
-// app.use(
-//   "/api2/downloadImageToServer",
-//   downloadImageToServerRouterAndController
-// );
-// app.use("/api2/generateData", generateDataRouterAndController);
+app.use(
+  "/api2/downloadImageToServer",
+  downloadImageToServerRouterAndController
+);
+app.use("/api2/generateData", generateDataRouterAndController);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
